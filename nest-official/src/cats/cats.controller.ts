@@ -8,17 +8,24 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UsePipes,
 } from '@nestjs/common';
-import { CreateCatDto } from '../dto/create-cat.dto';
-import { UpdateCatDto } from 'src/dto/update-cat.dto';
+// import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from 'src/cats/dto/update-cat.dto';
 import { CatsService } from './cats.service';
+import { ZodValidationPipe } from './pipe/ZodValidationPipe';
+import {
+  createCatSchema,
+  type CreateCatType,
+} from './schemas/create-cat.schema';
 
 @Controller('cats')
 export class CatsController {
   constructor(private catsService: CatsService) {}
 
   @Post()
-  create(@Body() createCatDto: CreateCatDto) {
+  @UsePipes(new ZodValidationPipe(createCatSchema))
+  create(@Body() createCatDto: CreateCatType) {
     this.catsService.create(createCatDto);
   }
 
