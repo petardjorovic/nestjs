@@ -2,13 +2,35 @@ export class UsersService {
   users: {
     id: number;
     name: string;
+    email: string;
     age: number;
     isMarried: boolean;
     gender: string;
   }[] = [
-    { id: 1, name: 'Petar', age: 36, isMarried: false, gender: 'male' },
-    { id: 2, name: 'Nenad', age: 31, isMarried: false, gender: 'male' },
-    { id: 3, name: 'Milica', age: 26, isMarried: true, gender: 'female' },
+    {
+      id: 1,
+      name: 'Petar',
+      age: 36,
+      isMarried: false,
+      gender: 'male',
+      email: 'petar@gmail.com',
+    },
+    {
+      id: 2,
+      name: 'Nenad',
+      age: 31,
+      isMarried: false,
+      gender: 'male',
+      email: 'nenad@gmail.com',
+    },
+    {
+      id: 3,
+      name: 'Milica',
+      age: 26,
+      isMarried: true,
+      gender: 'female',
+      email: 'milica@gmail.com',
+    },
   ];
 
   getAllUsers() {
@@ -25,6 +47,7 @@ export class UsersService {
     age: number;
     isMarried: boolean;
     gender: string;
+    email: string;
   }) {
     this.users.push(user);
   }

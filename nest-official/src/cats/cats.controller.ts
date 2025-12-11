@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -26,8 +28,14 @@ export class CatsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    console.log(id);
+  findOne(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ): string {
+    console.log(typeof id, id);
     return `This action returns a #${id} cat`;
   }
 
