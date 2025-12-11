@@ -1,25 +1,42 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
   @Get()
-  getAllUsers() {
+  getAllUsers(
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    console.log(limit, page);
     const usersService = new UsersService();
     return usersService.getAllUsers();
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id', ParseIntPipe) id: number) {
     const usersService = new UsersService();
-    return usersService.getUserById(Number(id));
+    return usersService.getUserById(id);
   }
 
   @Post()
   createUser() {
     const usersService = new UsersService();
-    const user = { id: 1, name: 'Petar', age: 36, isMarried: false };
+    const user = {
+      id: 1,
+      name: 'Petar',
+      age: 36,
+      isMarried: false,
+      gender: 'male',
+    };
     usersService.createUser(user);
     return 'You have successfully created new user.';
   }
