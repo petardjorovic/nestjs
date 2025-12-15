@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
 export class UsersService {
   users: {
     id: number;
@@ -6,6 +9,7 @@ export class UsersService {
     age: number;
     isMarried: boolean;
     gender: string;
+    password: string;
   }[] = [
     {
       id: 1,
@@ -14,6 +18,7 @@ export class UsersService {
       isMarried: false,
       gender: 'male',
       email: 'petar@gmail.com',
+      password: 'test1234',
     },
     {
       id: 2,
@@ -22,6 +27,7 @@ export class UsersService {
       isMarried: false,
       gender: 'male',
       email: 'nenad@gmail.com',
+      password: 'test1234',
     },
     {
       id: 3,
@@ -30,6 +36,7 @@ export class UsersService {
       isMarried: true,
       gender: 'female',
       email: 'milica@gmail.com',
+      password: 'test1234',
     },
   ];
 
@@ -48,6 +55,7 @@ export class UsersService {
     isMarried: boolean;
     gender: string;
     email: string;
+    password: string;
   }) {
     this.users.push(user);
   }

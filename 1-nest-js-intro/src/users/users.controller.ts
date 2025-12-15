@@ -11,26 +11,28 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GetUserParamDto } from './dto/get-user-param.dto';
+// import { GetUserParamDto } from './dto/get-user-param.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  @Get(':isMarried')
+  constructor(private readonly usersService: UsersService) {}
+
+  // @Get(':isMarried')
+  @Get()
   getAllUsers(
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Param() param: GetUserParamDto,
+    // @Param() param: GetUserParamDto,
   ) {
-    console.log(limit, page, param.isMarried);
-    const usersService = new UsersService();
-    return usersService.getAllUsers();
+    // console.log(limit, page, param.isMarried);
+    console.log(limit, page);
+    return this.usersService.getAllUsers();
   }
 
   @Get(':id')
   getUserById(@Param('id', ParseIntPipe) id: number) {
-    const usersService = new UsersService();
-    return usersService.getUserById(id);
+    return this.usersService.getUserById(id);
   }
 
   @Post()
@@ -45,6 +47,7 @@ export class UsersController {
     //   isMarried: false,
     //   gender: 'male',
     //   email: 'petar@gmail.com',
+    //   password: 'test1234'
     // };
     // usersService.createUser(user);
     return 'You have successfully created new user.';
