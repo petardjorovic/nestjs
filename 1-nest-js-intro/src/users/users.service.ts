@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
+
   users: {
     id: number;
     name: string;
@@ -45,7 +51,9 @@ export class UsersService {
   }
 
   getUserById(id: number) {
+    // if (this.authService.isAuthenticated) {
     return this.users.find((user) => user.id === id);
+    // }
   }
 
   createUser(user: {

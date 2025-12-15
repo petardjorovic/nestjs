@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+  ) {}
 
   public isAuthenticated: boolean = false;
 
@@ -13,7 +16,7 @@ export class AuthService {
       .find((u) => u.email === email && u.password === pasw);
     if (user) {
       this.isAuthenticated = true;
-      return user;
+      return `${user.name} are logged in!`;
     }
     return 'Wrong email or password!';
   }
