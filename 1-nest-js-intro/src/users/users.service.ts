@@ -1,70 +1,30 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
+import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Repository } from 'typeorm';
+import { Users } from './users.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
   ) {}
 
-  users: {
-    id: number;
-    name: string;
-    email: string;
-    age: number;
-    isMarried: boolean;
-    gender: string;
-    password: string;
-  }[] = [
-    {
-      id: 1,
-      name: 'Petar',
-      age: 36,
-      isMarried: false,
-      gender: 'male',
-      email: 'petar@gmail.com',
-      password: 'test1234',
-    },
-    {
-      id: 2,
-      name: 'Nenad',
-      age: 31,
-      isMarried: false,
-      gender: 'male',
-      email: 'nenad@gmail.com',
-      password: 'test1234',
-    },
-    {
-      id: 3,
-      name: 'Milica',
-      age: 26,
-      isMarried: true,
-      gender: 'female',
-      email: 'milica@gmail.com',
-      password: 'test1234',
-    },
-  ];
-
-  getAllUsers() {
-    return this.users;
+  public async getAllUsers() {
+    return this.usersRepository.find();
   }
 
-  getUserById(id: number) {
-    // if (this.authService.isAuthenticated) {
-    return this.users.find((user) => user.id === id);
-    // }
-  }
+  public async createUser(userDto: CreateUserDto) {
+    const user = await this.usersRepository.findOne({
+      where: { email: userDto.email },
+    });
+    if (user) {
+      return 'User with this email already exists';
+    }
+    let newUser = this.usersRepository.create(userDto);
+    newUser = await this.usersRepository.save(newUser);
 
-  createUser(user: {
-    id: number;
-    name: string;
-    age: number;
-    isMarried: boolean;
-    gender: string;
-    email: string;
-    password: string;
-  }) {
-    this.users.push(user);
+    return newUser;
   }
 }
