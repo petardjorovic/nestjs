@@ -1,37 +1,23 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Users {
+export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
     type: 'varchar',
-    nullable: false,
+    nullable: true,
     length: 100,
   })
   firstName: string;
 
   @Column({
     type: 'varchar',
-    nullable: false,
+    nullable: true,
     length: 100,
   })
   lastName: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: false,
-    length: 100,
-    unique: true,
-  })
-  email: string;
-
-  @Column({
-    type: 'int',
-    nullable: true,
-  })
-  age: number;
 
   @Column({
     type: 'varchar',
@@ -41,9 +27,20 @@ export class Users {
   gender: string;
 
   @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: false,
+    type: 'timestamp',
+    nullable: true,
   })
-  password: string;
+  dateOfBirth: Date;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  bio: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  profileImage: string;
 }
