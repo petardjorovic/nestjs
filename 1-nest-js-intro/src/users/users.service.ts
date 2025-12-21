@@ -15,7 +15,7 @@ export class UsersService {
   ) {}
 
   public async getAllUsers() {
-    return this.usersRepository.find();
+    return this.usersRepository.find({ relations: { profile: true } });
   }
 
   public async createUser(userDto: CreateUserDto) {
@@ -27,13 +27,7 @@ export class UsersService {
   }
 
   public async deleteUser(id: number) {
-    const user = await this.usersRepository.findOneBy({ id });
-
     await this.usersRepository.delete(id);
-
-    if (user) {
-      await this.profilesRepository.delete(user.profile.id);
-    }
 
     return { deleted: true };
   }
