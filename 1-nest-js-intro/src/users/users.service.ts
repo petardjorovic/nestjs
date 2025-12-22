@@ -18,6 +18,10 @@ export class UsersService {
     return this.usersRepository.find({ relations: { profile: true } });
   }
 
+  public async getUserById(id: number) {
+    return await this.usersRepository.findOneBy({ id });
+  }
+
   public async createUser(userDto: CreateUserDto) {
     userDto.profile = userDto.profile ?? {};
 
