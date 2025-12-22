@@ -13,8 +13,11 @@ export class TweetService {
     private readonly tweetRepository: Repository<Tweet>,
   ) {}
 
-  getTweets(userId: number) {
-    console.log(userId);
+  public async getTweets(userId: number) {
+    return await this.tweetRepository.find({
+      where: { user: { id: userId } },
+      relations: { user: true },
+    });
   }
 
   public async createTweet(createTweetDto: CreateTweetDto) {
