@@ -21,4 +21,10 @@ export class HashtagService {
     const hashtag = this.hashtagRepository.create(createHashtagDto);
     return await this.hashtagRepository.save(hashtag);
   }
+
+  public async deleteHashtag(id: number) {
+    await this.hashtagRepository.delete({ id });
+
+    return { deleted: true, id };
+  }
 }
