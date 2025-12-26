@@ -22,4 +22,9 @@ export class HashtagController {
   deleteHashtag(@Param('id', ParseIntPipe) id: number) {
     return this.hashtagService.deleteHashtag(id);
   }
+
+  @Delete('softDelete/:id')
+  softDeleteHashtag(@Param('id', ParseIntPipe) id: number) {
+    return this.hashtagService.softDeleteHashtag(id);
+  }
 }
