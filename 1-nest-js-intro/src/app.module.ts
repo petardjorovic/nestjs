@@ -8,7 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { appConfig } from './config/app.config';
+import appConfig from './config/app.config';
+import databaseConfig from './config/database.config';
 
 const enviroment = process.env.NODE_ENV;
 
@@ -20,7 +21,7 @@ const enviroment = process.env.NODE_ENV;
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !enviroment ? '.env' : `.env.${enviroment.trim()}`,
-      load: [appConfig],
+      load: [appConfig, databaseConfig],
       // envFilePath: '/src/.env', //* ako env file nije u root folderu projekta
     }),
     TypeOrmModule.forRootAsync({
