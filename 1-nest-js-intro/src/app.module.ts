@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { appConfig } from './config/app.config';
 
 const enviroment = process.env.NODE_ENV;
 
@@ -19,6 +20,7 @@ const enviroment = process.env.NODE_ENV;
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !enviroment ? '.env' : `.env.${enviroment.trim()}`,
+      load: [appConfig],
       // envFilePath: '/src/.env', //* ako env file nije u root folderu projekta
     }),
     TypeOrmModule.forRootAsync({
@@ -26,14 +28,16 @@ const enviroment = process.env.NODE_ENV;
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
+        host: configService.get<string>('database.host'),
+        port: configService.get<number>('database.port'),
+        username: configService.get<string>('database.username'),
+        password: configService.get<string>('database.password'),
+        database: configService.get<string>('database.name'),
         // entities: [User], //* mozemo ovako izlistati sve entity-je ili koristiti autoLoadEntities
-        autoLoadEntities: true,
-        synchronize: true,
+        autoLoadEntities: configService.get<boolean>(
+          'database.autoLoadEntities',
+        ),
+        synchronize: configService.get<boolean>('database.synchronize'),
       }),
     }),
     ProfileModule,

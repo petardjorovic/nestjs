@@ -18,7 +18,7 @@ export class UsersService {
   ) {}
 
   public async getAllUsers() {
-    const enviroment = this.configService.get<string>('ENV_MODE');
+    const enviroment = this.configService.get<string>('environment');
     console.log('Current Enviroment: ', enviroment);
     return this.usersRepository.find({ relations: { profile: true } });
   }
