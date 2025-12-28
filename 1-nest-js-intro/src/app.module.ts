@@ -10,6 +10,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
+import envValidation from './config/env.validation';
 
 const enviroment = process.env.NODE_ENV;
 
@@ -22,6 +23,7 @@ const enviroment = process.env.NODE_ENV;
       isGlobal: true,
       envFilePath: !enviroment ? '.env' : `.env.${enviroment.trim()}`,
       load: [appConfig, databaseConfig],
+      validationSchema: envValidation,
       // envFilePath: '/src/.env', //* ako env file nije u root folderu projekta
     }),
     TypeOrmModule.forRootAsync({
