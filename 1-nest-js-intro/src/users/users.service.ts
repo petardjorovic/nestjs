@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   RequestTimeoutException,
@@ -10,6 +12,7 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/profile/profile.entity';
 import { ConfigService } from '@nestjs/config';
+import { table } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -39,7 +42,17 @@ export class UsersService {
   public async getUserById(id: number) {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `User with ID ${id} not found`,
+          table: 'users',
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          description: `This execption occurred because the user with ID ${id} does not exist users table`,
+        },
+      );
     }
     return user;
   }
@@ -47,6 +60,15 @@ export class UsersService {
   public async createUser(userDto: CreateUserDto) {
     try {
       userDto.profile = userDto.profile ?? {};
+
+      const existingUser = await this.usersRepository.findOne({
+        where: [{ email: userDto.email }, { username: userDto.username }],
+      });
+      if (existingUser) {
+        throw new BadRequestException(
+          'User with this email / username already exists',
+        );
+      }
 
       const user = this.usersRepository.create(userDto);
 
@@ -58,12 +80,13 @@ export class UsersService {
           { description: 'Could not connect to the database' },
         );
       }
-      if (error.code === '23505') {
-        throw new BadRequestException(
-          'There is some duplicate value for the user in the database',
-        );
-      }
+      // if (error.code === '23505') {
+      //   throw new BadRequestException(
+      //     'There is some duplicate value for the user in the database',
+      //   );
+      // }
       console.log(error);
+      throw error;
     }
   }
 
