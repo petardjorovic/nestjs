@@ -13,6 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/profile/profile.entity';
 import { ConfigService } from '@nestjs/config';
 import { table } from 'console';
+import { UserAlreadyExistsException } from 'src/CustomExceptions/user-already-exists.exception';
 
 @Injectable()
 export class UsersService {
@@ -61,13 +62,18 @@ export class UsersService {
     try {
       userDto.profile = userDto.profile ?? {};
 
-      const existingUser = await this.usersRepository.findOne({
-        where: [{ email: userDto.email }, { username: userDto.username }],
+      const existingUserUsername = await this.usersRepository.findOne({
+        where: { username: userDto.username },
       });
-      if (existingUser) {
-        throw new BadRequestException(
-          'User with this email / username already exists',
-        );
+      if (existingUserUsername) {
+        throw new UserAlreadyExistsException('username', userDto.username);
+      }
+
+      const existingUserEmail = await this.usersRepository.findOne({
+        where: { email: userDto.email },
+      });
+      if (existingUserEmail) {
+        throw new UserAlreadyExistsException('email', userDto.email);
       }
 
       const user = this.usersRepository.create(userDto);
