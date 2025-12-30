@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -18,9 +23,17 @@ export class UsersService {
   ) {}
 
   public async getAllUsers() {
-    const enviroment = this.configService.get<string>('app.environment');
-    console.log('Current Enviroment: ', enviroment);
-    return this.usersRepository.find({ relations: { profile: true } });
+    try {
+      return await this.usersRepository.find({ relations: { profile: true } });
+    } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        throw new RequestTimeoutException(
+          'An error has occured, please try again later',
+          { description: 'Could not connect to the database' },
+        );
+      }
+      console.log(error);
+    }
   }
 
   public async getUserById(id: number) {
@@ -32,11 +45,26 @@ export class UsersService {
   }
 
   public async createUser(userDto: CreateUserDto) {
-    userDto.profile = userDto.profile ?? {};
+    try {
+      userDto.profile = userDto.profile ?? {};
 
-    const user = this.usersRepository.create(userDto);
+      const user = this.usersRepository.create(userDto);
 
-    return await this.usersRepository.save(user);
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        throw new RequestTimeoutException(
+          'An error has occured, please try again later',
+          { description: 'Could not connect to the database' },
+        );
+      }
+      if (error.code === '23505') {
+        throw new BadRequestException(
+          'There is some duplicate value for the user in the database',
+        );
+      }
+      console.log(error);
+    }
   }
 
   public async deleteUser(id: number) {
