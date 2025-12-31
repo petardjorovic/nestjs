@@ -1,10 +1,8 @@
 import {
-  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
-  NotFoundException,
-  RequestTimeoutException,
+  // RequestTimeoutException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
@@ -12,7 +10,6 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/profile/profile.entity';
 import { ConfigService } from '@nestjs/config';
-import { table } from 'console';
 import { UserAlreadyExistsException } from 'src/CustomExceptions/user-already-exists.exception';
 
 @Injectable()
@@ -30,12 +27,12 @@ export class UsersService {
     try {
       return await this.usersRepository.find({ relations: { profile: true } });
     } catch (error) {
-      if (error.code === 'ECONNREFUSED') {
-        throw new RequestTimeoutException(
-          'An error has occured, please try again later',
-          { description: 'Could not connect to the database' },
-        );
-      }
+      // if (error.code === 'ECONNREFUSED') {
+      //   throw new RequestTimeoutException(
+      //     'An error has occured, please try again later',
+      //     { description: 'Could not connect to the database' },
+      //   );
+      // }
       console.log(error);
     }
   }
@@ -80,12 +77,12 @@ export class UsersService {
 
       return await this.usersRepository.save(user);
     } catch (error) {
-      if (error.code === 'ECONNREFUSED') {
-        throw new RequestTimeoutException(
-          'An error has occured, please try again later',
-          { description: 'Could not connect to the database' },
-        );
-      }
+      // if (error.code === 'ECONNREFUSED') {
+      //   throw new RequestTimeoutException(
+      //     'An error has occured, please try again later',
+      //     { description: 'Could not connect to the database' },
+      //   );
+      // }
       // if (error.code === '23505') {
       //   throw new BadRequestException(
       //     'There is some duplicate value for the user in the database',
