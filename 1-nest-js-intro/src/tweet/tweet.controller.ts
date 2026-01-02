@@ -12,7 +12,7 @@ import {
 import { TweetService } from './tweet.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
-import { TweetQueryDatePaginationDto } from 'src/common/pagination/dto/tweet-query-date.dto';
+import { GetTweetQueryDto } from 'src/tweet/dto/get-tweet-query.dto';
 
 @Controller('tweet')
 export class TweetController {
@@ -21,7 +21,7 @@ export class TweetController {
   @Get(':userId')
   getTweets(
     @Param('userId', ParseIntPipe) userId: number,
-    @Query() paginationDto: TweetQueryDatePaginationDto,
+    @Query() paginationDto: GetTweetQueryDto,
   ) {
     return this.tweetService.getTweets(userId, paginationDto);
   }

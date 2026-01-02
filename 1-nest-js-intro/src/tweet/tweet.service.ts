@@ -6,7 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
-import { TweetQueryPaginationDto } from 'src/common/pagination/dto/tweet-query-pagination.dto';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class TweetService {
@@ -15,24 +16,28 @@ export class TweetService {
     private readonly hashtagService: HashtagService,
     @InjectRepository(Tweet)
     private readonly tweetRepository: Repository<Tweet>,
+
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
-  public async getTweets(
-    userId: number,
-    paginationDto: TweetQueryPaginationDto,
-  ) {
+  public async getTweets(userId: number, paginationDto: PaginationQueryDto) {
     const user = await this.usersService.getUserById(userId);
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    console.log(paginationDto);
 
-    return await this.tweetRepository.find({
-      where: { user: { id: userId } },
-      relations: { user: true, hashtags: true },
-      skip: (paginationDto.page - 1) * paginationDto.limit,
-      take: paginationDto.limit,
-    });
+    // return await this.tweetRepository.find({
+    //   where: { user: { id: userId } },
+    //   relations: { user: true, hashtags: true },
+    //   skip: (paginationDto.page - 1) * paginationDto.limit,
+    //   take: paginationDto.limit,
+    // });
+    return await this.paginationProvider.paginationQuery<Tweet>(
+      paginationDto,
+      this.tweetRepository,
+      { user: { id: userId } },
+      { user: true, hashtags: true },
+    );
   }
 
   public async createTweet(createTweetDto: CreateTweetDto) {

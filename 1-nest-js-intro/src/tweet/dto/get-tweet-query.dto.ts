@@ -1,8 +1,8 @@
 import { IntersectionType } from '@nestjs/mapped-types';
 import { IsDate, IsOptional } from 'class-validator';
-import { TweetQueryPaginationDto } from './tweet-query-pagination.dto';
+import { PaginationQueryDto } from '../../common/pagination/dto/pagination-query.dto';
 
-class TweetQueryDateDto {
+class GetTweetBaseDto {
   @IsOptional()
   @IsDate()
   startdate?: Date;
@@ -12,7 +12,7 @@ class TweetQueryDateDto {
   enddate?: Date;
 }
 
-export class TweetQueryDatePaginationDto extends IntersectionType(
-  TweetQueryPaginationDto,
-  TweetQueryDateDto,
+export class GetTweetQueryDto extends IntersectionType(
+  PaginationQueryDto,
+  GetTweetBaseDto,
 ) {}

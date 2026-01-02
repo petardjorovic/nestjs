@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { PaginationModule } from './common/pagination/pagination.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
@@ -45,6 +46,7 @@ const enviroment = process.env.NODE_ENV;
     }),
     ProfileModule,
     HashtagModule,
+    PaginationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
