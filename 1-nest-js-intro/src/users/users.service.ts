@@ -1,31 +1,33 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  // RequestTimeoutException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Profile } from 'src/profile/profile.entity';
 import { ConfigService } from '@nestjs/config';
 import { UserAlreadyExistsException } from 'src/CustomExceptions/user-already-exists.exception';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Profile)
-    private profilesRepository: Repository<Profile>,
 
     private readonly configService: ConfigService,
+
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
-  public async getAllUsers() {
+  public async getAllUsers(paginationDto: PaginationQueryDto) {
     try {
-      return await this.usersRepository.find({ relations: { profile: true } });
+      // return await this.usersRepository.find({ relations: { profile: true } });
+      return await this.paginationProvider.paginationQuery<User>(
+        paginationDto,
+        this.usersRepository,
+        undefined,
+        { profile: true },
+      );
     } catch (error) {
       // if (error.code === 'ECONNREFUSED') {
       //   throw new RequestTimeoutException(
