@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BcryptProvider } from './../auth/provider/bcrypt-provider';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -7,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserAlreadyExistsException } from 'src/CustomExceptions/user-already-exists.exception';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationProvider } from 'src/common/pagination/pagination.provider';
+import { HashingProvider } from 'src/auth/provider/hashing-provider';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +22,8 @@ export class UsersService {
     private usersRepository: Repository<User>,
 
     private readonly configService: ConfigService,
-
     private readonly paginationProvider: PaginationProvider,
+    private readonly hashingProvider: HashingProvider,
   ) {}
 
   public async getAllUsers(paginationDto: PaginationQueryDto) {
@@ -75,22 +82,25 @@ export class UsersService {
         throw new UserAlreadyExistsException('email', userDto.email);
       }
 
-      const user = this.usersRepository.create(userDto);
+      const user = this.usersRepository.create({
+        ...userDto,
+        password: await this.hashingProvider.hashPassword(userDto.password),
+      });
 
       return await this.usersRepository.save(user);
     } catch (error) {
-      // if (error.code === 'ECONNREFUSED') {
-      //   throw new RequestTimeoutException(
-      //     'An error has occured, please try again later',
-      //     { description: 'Could not connect to the database' },
-      //   );
-      // }
+      if (error.code === 'ECONNREFUSED') {
+        throw new RequestTimeoutException(
+          'An error has occured, please try again later',
+          { description: 'Could not connect to the database' },
+        );
+      }
       // if (error.code === '23505') {
       //   throw new BadRequestException(
       //     'There is some duplicate value for the user in the database',
       //   );
       // }
-      console.log(error);
+      // console.log(error);
       throw error;
     }
   }
