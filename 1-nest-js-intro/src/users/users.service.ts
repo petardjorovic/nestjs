@@ -1,9 +1,9 @@
-import { BcryptProvider } from './../auth/provider/bcrypt-provider';
 import {
   HttpException,
   HttpStatus,
   Injectable,
   RequestTimeoutException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
@@ -61,6 +61,23 @@ export class UsersService {
         },
       );
     }
+    return user;
+  }
+
+  public async getUserByUsername(username: string) {
+    let user: User | null = null;
+    try {
+      user = await this.usersRepository.findOneBy({ username });
+    } catch (error) {
+      throw new RequestTimeoutException(error, {
+        description: 'User with the given username could not be found',
+      });
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('User does not exist!');
+    }
+
     return user;
   }
 

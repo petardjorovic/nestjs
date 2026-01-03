@@ -1,8 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HashingProvider } from 'src/auth/provider/hashing-provider';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { type ConfigType } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import authConfig from './config/auth.config';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,7 @@ export class AuthService {
 
     @Inject(authConfig.KEY)
     private readonly authConfiguration: ConfigType<typeof authConfig>,
+    private readonly hashingProvider: HashingProvider,
   ) {}
 
   public isAuthenticated: boolean = false;
@@ -19,9 +22,24 @@ export class AuthService {
     return await this.usersService.createUser(createUserDto);
   }
 
-  login(email: string, pasw: string) {
-    console.log(email, pasw);
-    console.log(this.authConfiguration);
-    return 'Wrong email or password!';
+  public async login(loginUserDto: LoginUserDto) {
+    const user = await this.usersService.getUserByUsername(
+      loginUserDto.username,
+    );
+
+    const isPasswordValid = await this.hashingProvider.comparePassword(
+      loginUserDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Wrong username or password!');
+    }
+
+    return {
+      data: user,
+      success: true,
+      message: 'User logged in successfully',
+    };
   }
 }
