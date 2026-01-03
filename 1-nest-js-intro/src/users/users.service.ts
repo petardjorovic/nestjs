@@ -112,12 +112,6 @@ export class UsersService {
           { description: 'Could not connect to the database' },
         );
       }
-      // if (error.code === '23505') {
-      //   throw new BadRequestException(
-      //     'There is some duplicate value for the user in the database',
-      //   );
-      // }
-      // console.log(error);
       throw error;
     }
   }
