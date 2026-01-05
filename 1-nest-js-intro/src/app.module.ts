@@ -8,10 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { PaginationModule } from './common/pagination/pagination.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import envValidation from './config/env.validation';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+import authConfig from './auth/config/auth.config';
 
 const enviroment = process.env.NODE_ENV;
 
@@ -47,8 +51,21 @@ const enviroment = process.env.NODE_ENV;
     ProfileModule,
     HashtagModule,
     PaginationModule,
+    ConfigModule.forFeature(authConfig),
+    JwtModule.registerAsync({
+      imports: [ConfigModule.forFeature(authConfig)],
+      useFactory: (authConfiguration: ConfigType<typeof authConfig>) => ({
+        secret: authConfiguration.jwtSecretKey,
+        signOptions: {
+          expiresIn: authConfiguration.jwtExpiresIn,
+          audience: authConfiguration.jwtAudience,
+          issuer: authConfiguration.jwtIssuer,
+        },
+      }),
+      inject: [authConfig.KEY],
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {}

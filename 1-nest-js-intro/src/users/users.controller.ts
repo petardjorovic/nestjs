@@ -13,15 +13,18 @@ import { UsersService } from './users.service';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
 @Controller('users')
+// @UseGuards(AuthGuard) //* moze biti controller guard za sve rute u controlleru
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  // @UseGuards(AuthGuard)  //* moze biti route guard za pojedinacnu rutu
   getAllUsers(@Query() paginationDto: PaginationQueryDto) {
     return this.usersService.getAllUsers(paginationDto);
   }
 
   @Get(':id')
+  // @UseGuards(AuthGuard)  //* moze biti route guard za pojedinacnu rutu
   getUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getUserById(id);
   }
