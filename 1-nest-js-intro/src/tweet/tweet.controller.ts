@@ -13,6 +13,9 @@ import { TweetService } from './tweet.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
 import { GetTweetQueryDto } from 'src/tweet/dto/get-tweet-query.dto';
+import { type Request } from 'express';
+import { activeUser } from 'src/auth/decorators/active-user.decorator';
+import { type ActiveUserType } from 'src/auth/interfaces/active-user-type.interface';
 
 @Controller('tweet')
 export class TweetController {
@@ -27,8 +30,11 @@ export class TweetController {
   }
 
   @Post()
-  createTweet(@Body() tweet: CreateTweetDto) {
-    return this.tweetService.createTweet(tweet);
+  createTweet(
+    @Body() tweet: CreateTweetDto,
+    @activeUser() user: ActiveUserType,
+  ) {
+    return this.tweetService.createTweet(tweet, user);
   }
 
   @Patch()

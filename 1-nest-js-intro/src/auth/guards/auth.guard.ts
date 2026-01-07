@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import authConfig from '../config/auth.config';
 import { Reflector } from '@nestjs/core';
+import { REQUEST_USER_KEY } from 'src/constants/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -38,13 +39,19 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('No token provided');
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: {
+        sub: number;
+        email: string;
+        iat: number;
+        exp: number;
+        aud: string;
+        iss: string;
+      } = await this.jwtService.verifyAsync(token, {
         audience: this.authConfiguration.jwtAudience,
         issuer: this.authConfiguration.jwtIssuer,
         secret: this.authConfiguration.jwtSecretKey,
       });
-      request['user'] = payload;
-      console.log(request);
+      request[REQUEST_USER_KEY] = payload;
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException('Invalid token');
